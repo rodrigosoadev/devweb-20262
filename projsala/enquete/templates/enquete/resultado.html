@@ -1,131 +1,83 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Resultado da enquete</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
-	<style>
-		:root {
-			--ink: #17212b;
-			--muted: #66727d;
-			--mint: #b7f2d3;
-			--mint-dark: #157347;
-			--cream: #f7f6f1;
-		}
-
-		html { background: var(--cream); }
-		body {
-			color: var(--ink);
-			font-family: "DM Sans", sans-serif;
-			min-height: 100vh;
-		}
-
-		.title, .subtitle, .button { font-family: "Space Grotesk", sans-serif; }
-		.results-shell { max-width: 980px; margin: 0 auto; }
-		.results-hero {
-			background: linear-gradient(135deg, #173b35 0%, #216a53 58%, #7acb9b 100%);
-			border-radius: 0 0 28px 28px;
-			color: white;
-			overflow: hidden;
-			position: relative;
-		}
-		.results-hero::after {
-			background: rgba(255, 255, 255, .1);
-			border-radius: 50%;
-			content: "";
-			height: 220px;
-			position: absolute;
-			right: -70px;
-			top: -90px;
-			width: 220px;
-		}
-		.results-hero .title, .results-hero .subtitle { color: white; position: relative; z-index: 1; }
-		.ranking-panel { background: white; border-radius: 20px; box-shadow: 0 16px 45px rgba(23, 33, 43, .08); }
-		.ranking-row { border-bottom: 1px solid #edf0ed; padding: 1.25rem 0; }
-		.ranking-row:last-child { border-bottom: 0; }
-		.rank-number {
-			align-items: center;
-			background: #eff5f1;
-			border-radius: 12px;
-			color: var(--mint-dark);
-			display: flex;
-			font-family: "Space Grotesk", sans-serif;
-			font-weight: 700;
-			height: 42px;
-			justify-content: center;
-			width: 42px;
-		}
-		.rank-number.is-winner { background: var(--mint); color: #0e5c38; }
-		.progress-wrap { flex: 1; }
-		.progress { background-color: #edf2ee; height: 9px; margin: .55rem 0 0; }
-		.progress::-webkit-progress-value { background-color: var(--mint-dark); }
-		.progress::-moz-progress-bar { background-color: var(--mint-dark); }
-		.metric { color: var(--muted); font-size: .88rem; white-space: nowrap; }
-		.vote-button { background: var(--mint); border: 0; color: #0e5c38; }
-		.vote-button:hover { background: #96e8bb; color: #0e5c38; }
-		@media (max-width: 600px) {
-			.results-hero { border-radius: 0 0 20px 20px; }
-			.ranking-panel { border-radius: 16px; }
-			.metric { font-size: .8rem; }
-		}
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado da Enquete</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+    <style>
+        .ranking-bar {
+            height: 2rem;
+            border-radius: 9999px;
+            background: linear-gradient(90deg, #00d1b2, #7a5af8);
+            transition: width 1s ease-in-out;
+        }
+        .ranking-track {
+            background-color: #f0f0f0;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        .winner-card {
+            border: 3px solid #ffdd57;
+            box-shadow: 0 0 25px rgba(255, 221, 87, 0.6);
+        }
+    </style>
 </head>
 <body>
-	<main>
-		<section class="results-hero">
-			<div class="results-shell px-5 py-6">
-				<p class="is-size-7 has-text-weight-semibold is-uppercase mb-3">Enquete encerrada</p>
-				<h1 class="title is-2 mb-3">O ranking da comunidade</h1>
-				<p class="subtitle is-5 mb-0">Qual seu framework web favorito?</p>
-			</div>
-		</section>
+    <header>
+        <h1 class="title is-1 has-text-centered mt-4">🏆 Resultado da Votação 🏆</h1>
+    </header>
+    <main>
+        <section class="hero is-link is-medium">
+            <div class="hero-body">
+                <div class="container">
+                    {% with ranking=alternativas|dictsortreversed:"votos" %}
 
-		<section class="section pt-6">
-			<div class="results-shell">
-				<div class="level mb-5">
-					<div class="level-left">
-						<div>
-							<h2 class="title is-4 mb-1">Resultados</h2>
-							<p class="has-text-grey">Veja como as tecnologias foram votadas.</p>
-						</div>
-					</div>
-					<div class="level-right">
-						<span class="tag is-success is-light is-medium">Ranking atual</span>
-					</div>
-				</div>
+                    <!-- Destaque do vencedor -->
+                    <div class="box winner-card has-text-centered mb-6">
+                        <p class="subtitle is-4 mb-1 has-text-dark">🎉 Vencedor(a) 🎉</p>
+                        <p class="title is-2 has-text-warning-dark">{{ ranking.0.texto }}</p>
+                        <p class="subtitle is-5">{{ ranking.0.votos }} voto{{ ranking.0.votos|pluralize }}</p>
+                    </div>
 
-				<div class="ranking-panel p-5">
-					{% with itens=ranking|default:alternativas %}
-						{% for item in itens %}
-							<div class="ranking-row is-flex is-align-items-center {% if forloop.first %}has-background-success-light px-3{% endif %}">
-								<div class="rank-number {% if forloop.first %}is-winner{% endif %} mr-4">{{ forloop.counter|stringformat:"02d" }}</div>
-								<div class="progress-wrap">
-									<div class="is-flex is-justify-content-space-between is-align-items-center">
-										<strong class="is-size-5">{{ item.nome|default:item.texto }}</strong>
-										<span class="metric">{{ item.percentual|default:0 }}%</span>
-									</div>
-									<progress class="progress is-success" value="{{ item.percentual|default:0 }}" max="100">{{ item.percentual|default:0 }}%</progress>
-								</div>
-								<span class="metric ml-4">{{ item.votos|default:0 }} voto{{ item.votos|default:0|pluralize }}</span>
-							</div>
-						{% empty %}
-							<div class="has-text-centered py-6">
-								<p class="title is-5">Ainda não há votos</p>
-								<p class="has-text-grey">Participe para inaugurar este ranking.</p>
-							</div>
-						{% endfor %}
-					{% endwith %}
-				</div>
+                    <!-- Ranking com barras -->
+                    {% for alternativa in ranking %}
+                    <div class="box mb-4">
+                        <div class="level mb-2">
+                            <div class="level-left">
+                                <span class="title is-4 mr-2">
+                                    {% if forloop.first %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% else %}#{{ forloop.counter }}{% endif %}
+                                </span>
+                                <span class="subtitle is-4">{{ alternativa.texto }}</span>
+                            </div>
+                            <div class="level-right">
+                                <span class="tag is-primary is-large">{{ alternativa.votos }} voto{{ alternativa.votos|pluralize }}</span>
+                            </div>
+                        </div>
+                        <div class="ranking-track">
+                            {% if ranking.0.votos > 0 %}
+                                {% widthratio alternativa.votos ranking.0.votos 100 as percentual %}
+                            {% else %}
+                                {% widthratio 0 1 100 as percentual %}
+                            {% endif %}
+                            <div class="ranking-bar" style="width: {{ percentual }}%;"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
 
-				<div class="has-text-centered mt-6">
-					<a class="button vote-button is-medium px-5" href="{% url 'index' %}">Voltar para a enquete</a>
-				</div>
-			</div>
-		</section>
-	</main>
+                    {% endwith %}
+
+                    <div class="has-text-centered mt-5">
+                        <a href="{% url 'enquete:index' %}" class="button is-warning is-medium">Votar novamente</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <p>&copy; 2026 Enquete</p>
+        </div>
+    </footer>
 </body>
 </html>

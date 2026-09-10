@@ -5,8 +5,8 @@ from django.http import HttpResponse
 
 def index(request):
     return render(request,'index.html')
-def rodrigo(request):
-    return HttpResponse("<h1>Olá Rodrigo</h1>")
+def heloisa(request):
+    return HttpResponse("<h1>Olá Heloisa</h1>")
 def tabuada2(request):
     n=2
     texto=''
@@ -17,9 +17,9 @@ def tabuada2(request):
     return HttpResponse(texto)
 
 def calcular_imc(request):
-    altura=float(request.GET.get("altura"))
-    peso=float(request.GET.get("peso"))
-    altura=altura/100.0
+    altura=float(request.POST["altura"])
+    peso=float(request.POST["peso"])
+    #altura=altura/100.0
     imc=peso/(altura*altura)
     if imc < 18.5:
         classificacao = 'Abaixo do peso'
