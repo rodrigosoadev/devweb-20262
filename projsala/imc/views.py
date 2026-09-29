@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-
+from django.http import HttpResponse,JsonResponse
+from . import services
 # Create your views here.
 
 def index(request):
@@ -16,24 +16,29 @@ def tabuada2(request):
 
     return HttpResponse(texto)
 
+def mensagem(request):
+
+    if (request.htmx):
+        mensagem='Olá HTMX!!!'
+        contexto={
+            'mensagem':mensagem
+        }
+        return render(request,"mensagem.html",contexto)
+    else:    
+        dicionario={'mensagem':'Olá IMC - Dev Web'}
+        return JsonResponse(dicionario)
+
 def calcular_imc(request):
     altura=float(request.POST["altura"])
     peso=float(request.POST["peso"])
-    #altura=altura/100.0
-    imc=peso/(altura*altura)
-    if imc < 18.5:
-        classificacao = 'Abaixo do peso'
-    elif imc < 24.9:
-        classificacao = 'Peso normal'
-    elif imc < 29.9:
-        classificacao = 'Sobrepeso'
-    else:
-        classificacao = 'Obesidade'
-    #resposta=f'O Valor do IMC é {(peso/(altura*altura)):.2f}'
+    imc,classificacao=services.calcular_imc(altura,peso)
     contexto={
         'peso':peso,
         'altura':altura,
         'imc':f'{imc:.2f}',
         'classificacao':classificacao,
     }
-    return render(request,'resultado.html',context=contexto)
+    if request.htmx:
+        return render(request,'resultado_partial.html',context=contexto)
+    else:
+        return render(request,'resultado.html',context=contexto)

@@ -1,0 +1,9 @@
+.table {
+    --bulma-table-row-hover-background-color: var(--bulma-primary)
+}
+
+figure img {
+    display: block;
+    box-sizing: border-box;
+    position: relative;
+}
